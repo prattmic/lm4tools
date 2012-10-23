@@ -123,10 +123,19 @@ gdb_statemachine(GDBCTX *pGdbCtx, unsigned char *pBuf, unsigned int len,
                     break;
                }
                pGdbCtx->pResp[pGdbCtx->iRd++] = *pBuf;
+               if (*pBuf == 0x03)
+               {
+                   /* GDB Ctrl-C */
+                   if (pFn)
+                   {
+                       pFn(pGdbCtx, 1);
+                       pGdbCtx->iRd = 0;
+                   }
+               }
                pBuf++;
                break;
             case GDB_PAYLOAD:
-               TRACE(0, "GDB_PAYLOAD: '%c'\n", *pBuf);
+               TRACE(0, "GDB_PAYLOAD: '%c' 0x%02x\n", isprint(*pBuf) ? *pBuf : '.', *pBuf);
                    pGdbCtx->pResp[pGdbCtx->iRd++] = *pBuf;
                if (*pBuf == '#')
                {
@@ -214,5 +223,6 @@ usb_callback(struct libusb_transfer *pTrans)
 
         default:
             TRACE(ALWAYS, "%s: status = 0x%08x\n", __FUNCTION__, pTrans->status);
+            break;
     }
 }

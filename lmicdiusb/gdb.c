@@ -108,20 +108,6 @@ gdb_statemachine(GDBCTX *pGdbCtx, unsigned char *pBuf, unsigned int len,
                {
                     pGdbCtx->iNakCount++;
                }
-               /* Interrupt the core */
-               if (*pBuf == 0x03) {
-                    TRACE(1, "Interrupt received, halting core.\n");
-                    pGdbCtx->pResp[pGdbCtx->iRd++] = '$';
-                    pGdbCtx->pResp[pGdbCtx->iRd++] = '?';
-                    pGdbCtx->pResp[pGdbCtx->iRd++] = '#';
-                    pGdbCtx->pResp[pGdbCtx->iRd++] = '3';
-                    pGdbCtx->pResp[pGdbCtx->iRd++] = 'f';
-                    pFn(pGdbCtx, 1);
-                    pGdbCtx->iRd = 0;
-                    pGdbCtx->gdb_state = GDB_IDLE;
-                    pBuf++;
-                    break;
-               }
                pGdbCtx->pResp[pGdbCtx->iRd++] = *pBuf;
                if (*pBuf == 0x03)
                {
